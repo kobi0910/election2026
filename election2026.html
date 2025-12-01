@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 政治光譜儀表板 | Political Spectrum</title>
+    
+    <!-- 引入質感字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Noto+Sans+TC:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0f172a; /* 深藍黑背景 */
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            
+            /* 霓虹色系光譜 */
+            --color-red: #ff4757;
+            --color-blue: #2f80ed; 
+            --color-green: #2ed573;
+            --color-white: #ffffff;
+            
+            --track-height: 12px;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(47, 128, 237, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(46, 213, 115, 0.1) 0%, transparent 40%);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header Design */
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            background: linear-gradient(90deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* Container */
+        .dashboard-container {
+            width: 90%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* City Navigation (Pills) */
+        .nav-wrapper {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .city-pill {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 10px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .city-pill:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .city-pill.active {
+            background: #fff;
+            color: var(--bg-color);
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Glass Card */
+        .spectrum-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 50px 40px;
+            position: relative;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: visible; /* Allow markers to stick out */
+        }
+
+        /* The Spectrum Track */
+        .spectrum-axis-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .label-red { color: var(--color-red); text-shadow: 0 0 10px rgba(255, 71, 87, 0.4); }
+        .label-blue { color: var(--color-blue); text-shadow: 0 0 10px rgba(47, 128, 237, 0.4); text-align: center;}
+        .label-green { color: var(--color-green); text-shadow: 0 0 10px rgba(46, 213, 115, 0.4); text-align: right;}
+
+        .track-container {
+            position: relative;
+            height: 80px; /* Space for markers */
+            display: flex;
+            align-items: center;
+        }
+
+        .track-bg {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, 
+                #ff4757 0%, 
+                #a29bfe 45%,
+                #74b9ff 50%,
+                #55efc4 55%, 
+                #2ed573 100%);
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Ticks on the track */
+        .tick {
+            position: absolute;
+            top: -5px;
+            width: 1px;
+            height: 16px;
+            background: rgba(255,255,255,0.2);
+        }
+        .tick.center {
+            height: 24px;
+            top: -9px;
+            background: #fff;
+            width: 2px;
+            left: 50%;
+            box-shadow: 0 0 10px #fff;
+        }
+
+        /* Candidate Avatar/Marker */
+        .marker {
+            position: absolute;
+            top: 50%; /* Center vertically on track */
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--bg-color);
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .marker:hover {
+            transform: translate(-50%, -60%) scale(1.15);
+            z-index: 20;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .marker-initial {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .marker-tooltip {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .marker:hover .marker-tooltip {
+            opacity: 1;
+        }
+
+        /* Party Colors */
+        .kmt { border-color: #54a0ff; box-shadow: 0 0 15px rgba(84, 160, 255, 0.4); }
+        .dpp { border-color: #2ed573; box-shadow: 0 0 15px rgba(46, 213, 115, 0.4); }
+        .tpp { border-color: #48dbfb; box-shadow: 0 0 15px rgba(72, 219, 251, 0.4); }
+
+        /* Detail Panel */
+        .detail-panel {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .score-num {
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .score-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        .info-content h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+
+        .party-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.1);
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+
+        .quote-block {
+            font-style: italic;
+            color: var(--text-secondary);
+            border-left: 3px solid var(--color-blue);
+            padding-left: 15px;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .analysis-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #d1d5db;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .detail-panel {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .score-circle {
+                margin: 0 auto;
+            }
+            .quote-block {
+                text-align: left;
+            }
+            .spectrum-card {
+                padding: 30px 15px;
+            }
+            .spectrum-axis-labels {
+                font-size: 0.7rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>POLITICAL SPECTRUM</h1>
+    <p class="subtitle">2026 縣市長候選人 兩岸政治定位分析</p>
+</header>
+
+<div class="dashboard-container">
+    <div class="nav-wrapper" id="cityNav">
+        <!-- City Pills Generated by JS -->
+    </div>
+
+    <div class="spectrum-card">
+        <div class="spectrum-axis-labels">
+            <div class="label-red">◀ 親中 / 統派</div>
+            <div class="label-blue">中華民國 / 現狀</div>
+            <div class="label-green">抗中 / 獨立 ▶</div>
+        </div>
+
+        <div class="track-container">
+            <div class="track-bg" id="trackBg">
+                <div class="tick center"></div>
+                <!-- JS will generate ticks -->
+            </div>
+            <div id="markerContainer">
+                <!-- Markers go here -->
+            </div>
+        </div>
+
+        <!-- Detail Panel (Dynamic Content) -->
+        <div class="detail-panel" id="detailPanel" style="display:none;">
+            <div class="score-circle" id="scoreCircle">
+                <span class="score-num" id="scoreNum">50</span>
+                <span class="score-label">POSITION</span>
+            </div>
+            <div class="info-content">
+                <h2 id="candName">候選人 <span class="party-badge" id="partyBadge">黨籍</span></h2>
+                <div class="quote-block" id="candQuote">"言論..."</div>
+                <p class="analysis-text" id="candAnalysis">分析...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 數據結構 (同前，增加了顏色代碼) ---
+    const candidates = {
+        "台北市": [
+            { name: "蔣萬安", party: "kmt", score: 42, quote: "「雙城論壇是目前兩岸唯一官方交流管道，必須堅持下去。」", analysis: "蔣家後代，立場正藍。為爭取中間選民，避免過度親中標籤，但堅持兩岸官方交流，定於藍營中線偏左。" },
+            { name: "黃珊珊", party: "tpp", score: 55, quote: "「台灣是主權獨立國家，名叫中華民國。」", analysis: "民眾黨籍，不強調九二共識，但也拒絕抗中路線。試圖走出非藍非綠的『台灣民眾』路線，略偏台灣主體性。" },
+            { name: "王世堅", party: "dpp", score: 82, quote: "「中共對台灣的野心從未停止，我們必須武裝自己。」", analysis: "民進黨內的『柯學家』，但在國家認同與抗中議題上是傳統深綠台派，立場極其鮮明。" },
+            { name: "吳思瑤", party: "dpp", score: 88, quote: "「藍白聯手阻擋國防預算，就是弱化台灣保護力。」", analysis: "緊跟賴清德政府的『互不隸屬』路線，強力對抗藍白國會聯盟，光譜屬於堅定台派。" }
+        ],
+        "新北市": [
+            { name: "洪孟楷", party: "kmt", score: 40, quote: "「民進黨只會賣芒果乾，兩岸和平才是重點。」", analysis: "國民黨新生代戰將，遵循黨中央基調，強調九二共識精神與交流，位置在標準藍營區塊。" },
+            { name: "黃國昌", party: "tpp", score: 48, quote: "「民進黨不要再用抗中保台來掩飾執政無能。」", analysis: "雖出身太陽花(極綠)，但近期與國民黨高度合作且停止批判中國。被視為『實質助藍』，光譜移至中線偏藍。" },
+            { name: "蘇巧慧", party: "dpp", score: 90, quote: "「台灣與中國互不隸屬是客觀事實。」", analysis: "承襲蘇貞昌風格，對任何弱化主權論述皆強力反擊，新北綠營中光譜最鮮明者。" },
+            { name: "劉和然", party: "kmt", score: 45, quote: "「侯友宜市長的路線，就是中華民國這塊招牌。」", analysis: "侯友宜接班人，延續『中華民國派』與不沾鍋路線，避談意識形態，極接近中線。" }
+        ],
+        "台中市": [
+            { name: "江啟臣", party: "kmt", score: 48, quote: "「我是台灣人也是中國人；中華民國是最大公約數。」", analysis: "國民黨內親美派/本土派，論述貼近美方，相對不親中，極接近中線。" },
+            { name: "楊瓊瓔", party: "kmt", score: 38, quote: "「兩岸要貨暢其流，農產品要賣得出去。」", analysis: "傳統地方派系，重經貿紅利，對中國善意持高度歡迎，少談國安風險，偏傳統藍。" },
+            { name: "何欣純", party: "dpp", score: 80, quote: "「守護台灣民主自由，寸步不讓。」", analysis: "基層實力雄厚，核心立場穩固站在台灣本土派，支持國防自主。" }
+        ],
+        "高雄市": [
+            { name: "柯志恩", party: "kmt", score: 46, quote: "「愛台灣不是民進黨的專利。」", analysis: "學者形象溫和。為在深綠選區突圍，淡化統派色彩，強調在地建設，走淺藍中間路線。" },
+            { name: "潘孟安", party: "dpp", score: 92, quote: "「紅色滲透無孔不入，南台灣是民主堡壘。」", analysis: "賴清德核心人馬，草根意識強，對抗中議題極為強硬，光譜極綠。" },
+            { name: "林岱樺", party: "dpp", score: 75, quote: "「務實面對兩岸經貿問題。」", analysis: "選區產業界與對岸有往來，加上宗教背景，言詞較緩和，屬於務實台派。" }
+        ]
+    };
+
+    // --- 程式邏輯 ---
+    const cityNav = document.getElementById('cityNav');
+    const markerContainer = document.getElementById('markerContainer');
+    const detailPanel = document.getElementById('detailPanel');
+    const trackBg = document.getElementById('trackBg');
+
+    // 產生刻度
+    for(let i=10; i<100; i+=10) {
+        if(i===50) continue; // 中線已經有了
+        const tick = document.createElement('div');
+        tick.className = 'tick';
+        tick.style.left = i + '%';
+        trackBg.appendChild(tick);
+    }
+
+    function init() {
+        Object.keys(candidates).forEach((city, index) => {
+            const btn = document.createElement('div');
+            btn.className = `city-pill ${index === 0 ? 'active' : ''}`;
+            btn.innerText = city;
+            btn.onclick = () => loadCity(city, btn);
+            cityNav.appendChild(btn);
+        });
+        loadCity(Object.keys(candidates)[0], cityNav.firstChild);
+    }
+
+    function loadCity(city, activeBtn) {
+        // 更新按鈕樣式
+        document.querySelectorAll('.city-pill').forEach(b => b.classList.remove('active'));
+        activeBtn.classList.add('active');
+
+        // 清空並隱藏詳情
+        markerContainer.innerHTML = '';
+        detailPanel.style.display = 'none';
+        detailPanel.style.animation = 'none'; // reset animation
+
+        const people = candidates[city];
+        
+        // 渲染標記 (增加延遲動畫效果)
+        people.forEach((p, idx) => {
+            const marker = document.createElement('div');
+            marker.className = `marker ${p.party}`;
+            marker.style.left = `${p.score}%`;
+            
+            // 垂直錯位邏輯：簡單用奇偶數區分上下
+            // 為了美觀，我們用 translateY 來微調
+            // 偶數: 向上偏移, 奇數: 向下偏移
+            const verticalOffset = (idx % 2 === 0) ? -20 : 20; 
+            // 注意：這裡是相對於 top: 50% 的額外位移，我們透過 margin 或 transform 來做
+            // 為了不覆蓋 CSS 的 hover transform，我們用 margin-top
+            marker.style.marginTop = `${verticalOffset}px`;
+
+            marker.innerHTML = `
+                <span class="marker-initial">${p.name.substr(p.name.length-1, 1)}</span>
+                <div class="marker-tooltip">${p.name}</div>
+            `;
+            
+            // 點擊事件
+            marker.onclick = () => showDetail(p, marker);
+
+            markerContainer.appendChild(marker);
+        });
+        
+        // 預設點擊第一個人(可選)
+        // showDetail(people[0]); 
+    }
+
+    function showDetail(data, markerEl) {
+        // 重置動畫
+        detailPanel.style.display = 'grid';
+        detailPanel.style.animation = 'none';
+        detailPanel.offsetHeight; /* trigger reflow */
+        detailPanel.style.animation = 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+
+        // 填入資料
+        const colors = { kmt: '#54a0ff', dpp: '#2ed573', tpp: '#48dbfb' };
+        const partyColor = colors[data.party] || '#fff';
+        
+        const scoreCircle = document.getElementById('scoreCircle');
+        scoreCircle.style.borderColor = partyColor;
+        scoreCircle.style.color = partyColor;
+        
+        // 數字動畫
+        animateValue("scoreNum", parseInt(document.getElementById("scoreNum").innerText), data.score, 500);
+
+        document.getElementById('candName').innerHTML = `${data.name} <span class="party-badge" style="background:${partyColor}20; color:${partyColor}">${data.party.toUpperCase()}</span>`;
+        document.getElementById('candQuote').innerText = data.quote;
+        document.getElementById('candQuote').style.borderLeftColor = partyColor;
+        document.getElementById('candAnalysis').innerText = data.analysis;
+    }
+
+    // 數字跳動動畫
+    function animateValue(id, start, end, duration) {
+        const obj = document.getElementById(id);
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    init();
+</script>
+
+</body>
+</html>
