@@ -3,89 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 ELECTION PROTOCOL // GAME MODE</title>
+    <title>2026 政治光譜 // 戰略模擬系統</title>
     
-    <!-- 引入科幻/遊戲風格字體 -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- 引入具有科技感的字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Noto+Sans+TC:wght@300;500;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-color: #050505;
-            --grid-color: rgba(0, 255, 65, 0.05);
+            --bg-color: #050b14;
+            --grid-color: rgba(0, 255, 255, 0.03);
             
-            /* Game Colors */
-            --neon-cyan: #00f3ff;   /* KMT/Blue equivalent */
-            --neon-magenta: #ff0055; /* Red equivalent */
-            --neon-green: #39ff14;   /* DPP/Green equivalent */
-            --neon-yellow: #ffff00;  /* TPP/White equivalent */
+            /* 陣營代表色 (霓虹版) */
+            --neon-blue: #00f3ff;   /* 國民黨/藍 */
+            --neon-green: #39ff14;  /* 民進黨/綠 */
+            --neon-yellow: #ffea00; /* 民眾黨/白 */
+            --neon-red: #ff0055;    /* 親中/紅 */
+            --neon-gray: #a0a0a0;   /* 無黨 */
             
-            --hud-border: #00f3ff;
-            --hud-bg: rgba(0, 20, 30, 0.85);
+            --border-color: #00f3ff;
+            --panel-bg: rgba(6, 15, 30, 0.85);
         }
 
         body {
             background-color: var(--bg-color);
             color: #fff;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'Noto Sans TC', sans-serif;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+            /* 網格背景 */
             background-image: 
                 linear-gradient(var(--grid-color) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 30px 30px;
+            background-size: 40px 40px;
             min-height: 100vh;
         }
 
-        /* --- CRT Scanline Effect --- */
+        /* 掃描線特效 */
         body::before {
             content: " ";
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
             z-index: 2;
-            background-size: 100% 2px, 3px 100%;
+            background-size: 100% 4px;
             pointer-events: none;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 30px 20px;
             position: relative;
             z-index: 3;
         }
 
-        /* --- Header: Game Title --- */
+        /* --- 標題區 --- */
         header {
             text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid var(--neon-cyan);
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
             padding-bottom: 20px;
-            position: relative;
         }
 
         h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            color: var(--neon-cyan);
-            text-transform: uppercase;
-            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+            font-size: 2.5rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 15px var(--neon-blue);
             margin: 0;
-            letter-spacing: 5px;
+            letter-spacing: 2px;
+            font-weight: 700;
         }
 
         .system-status {
             display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--neon-cyan);
+            justify-content: center;
+            gap: 20px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
             margin-top: 10px;
-            opacity: 0.8;
+            font-family: 'Orbitron', sans-serif;
         }
 
-        /* --- Mode Selector (Tabs) --- */
+        /* --- 模式切換按鈕 --- */
         .mode-select {
             display: flex;
             justify-content: center;
@@ -95,171 +96,181 @@
 
         .mode-btn {
             background: transparent;
-            border: 1px solid var(--neon-cyan);
-            color: var(--neon-cyan);
-            padding: 10px 30px;
-            font-family: 'Orbitron', sans-serif;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 12px 30px;
+            font-size: 1.1rem;
             font-weight: 700;
             cursor: pointer;
-            text-transform: uppercase;
-            clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);
+            /* 科幻切角造型 */
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
             transition: 0.2s;
+            position: relative;
         }
 
         .mode-btn:hover {
-            background: rgba(0, 243, 255, 0.2);
+            background: rgba(0, 243, 255, 0.15);
+            text-shadow: 0 0 8px var(--neon-blue);
         }
 
         .mode-btn.active {
-            background: var(--neon-cyan);
+            background: var(--neon-blue);
             color: #000;
-            box-shadow: 0 0 15px var(--neon-cyan);
+            box-shadow: 0 0 20px var(--neon-blue);
         }
 
-        /* --- Map/Zone Selector --- */
+        /* --- 地區/分類選擇 --- */
         .zone-selector {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             justify-content: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
+            min-height: 40px;
         }
 
         .zone-btn {
-            background: #111;
-            border: 1px solid #333;
-            color: #666;
-            padding: 5px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #444;
+            color: #888;
+            padding: 8px 20px;
             cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            border-radius: 2px;
         }
         
-        .zone-btn:hover { border-color: #fff; color: #fff; }
-        
-        .zone-btn.active {
-            border-color: var(--neon-green);
-            color: var(--neon-green);
-            background: rgba(57, 255, 20, 0.1);
-            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
-            font-weight: bold;
+        .zone-btn:hover, .zone-btn.active {
+            border-color: #fff;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
-
-        /* --- Main HUD Interface --- */
+        
+        /* --- 主控制台 (HUD) --- */
         .hud-interface {
             display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 30px;
+            grid-template-columns: 1fr 360px;
+            gap: 20px;
+            background: var(--panel-bg);
             border: 1px solid #333;
-            background: rgba(0,0,0,0.6);
-            padding: 20px;
+            padding: 25px;
             position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         
-        /* Corner decors */
-        .hud-interface::after {
-            content: "";
+        /* 四角裝飾 */
+        .hud-decor {
             position: absolute;
-            top: -2px; left: -2px;
-            width: 20px; height: 20px;
-            border-top: 2px solid var(--neon-cyan);
-            border-left: 2px solid var(--neon-cyan);
+            width: 15px; height: 15px;
+            border: 2px solid var(--neon-blue);
+            transition: 0.3s;
         }
-        .hud-interface::before {
-            content: "";
-            position: absolute;
-            bottom: -2px; right: -2px;
-            width: 20px; height: 20px;
-            border-bottom: 2px solid var(--neon-cyan);
-            border-right: 2px solid var(--neon-cyan);
-        }
+        .tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+        .tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+        .bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+        .br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
 
-        /* --- Spectrum Track Area --- */
+        /* --- 左側：光譜地圖 --- */
         .spectrum-area {
             position: relative;
-            padding: 40px 20px;
-            border-right: 1px dashed #333;
+            padding: 20px 10px;
+            border-right: 1px solid rgba(255,255,255,0.1);
         }
 
         .axis-top {
             display: flex;
             justify-content: space-between;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
-            margin-bottom: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
         }
 
-        .spectrum-bar {
-            height: 30px;
-            background: #222;
+        .spectrum-track {
+            height: 40px;
+            background: #111;
             position: relative;
-            margin: 40px 0;
-            border: 1px solid #555;
-            /* Gradient: Red -> Blue -> Green */
+            margin: 60px 0; /* 上下留白給頭像 */
+            border: 1px solid #444;
+            /* 漸層：紅 -> 紫 -> 藍 -> 青 -> 綠 */
             background: linear-gradient(90deg, 
-                var(--neon-magenta) 0%, 
-                #440022 30%,
+                var(--neon-red) 0%, 
+                #4a00e0 25%,
                 #002244 50%, 
-                #004422 70%, 
+                #005f40 75%, 
                 var(--neon-green) 100%);
-            box-shadow: inset 0 0 20px #000;
+            box-shadow: inset 0 0 30px #000;
         }
 
         .mid-line {
             position: absolute;
-            left: 50%; top: -10px; bottom: -10px;
+            left: 50%; top: -15px; bottom: -15px;
             width: 2px;
             background: #fff;
             box-shadow: 0 0 10px #fff;
             z-index: 1;
         }
+        .mid-label {
+            position: absolute;
+            left: 50%; top: -35px;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #fff;
+            background: #000;
+            padding: 2px 5px;
+            border: 1px solid #444;
+        }
 
-        /* Character Unit (Marker) */
+        /* 角色單位 (Unit Marker) */
         .unit-marker {
             position: absolute;
             top: 50%;
             transform: translate(-50%, -50%);
-            width: 40px; 
-            height: 40px;
+            width: 42px; 
+            height: 42px;
             background: #000;
-            border: 2px solid #fff;
+            border: 2px solid #888;
             cursor: pointer;
             z-index: 10;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            transition: 0.3s;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* 六角形或科技感切角 */
             clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
         }
 
         .unit-marker:hover {
-            transform: translate(-50%, -50%) scale(1.2);
+            transform: translate(-50%, -50%) scale(1.3);
             z-index: 100;
-            background: #fff;
-            color: #000;
-            box-shadow: 0 0 20px #fff;
+            box-shadow: 0 0 25px currentColor;
         }
-
+        
         .unit-marker.active {
             background: #fff;
-            color: #000;
-            box-shadow: 0 0 20px #fff;
+            color: #000 !important;
+            border-color: #fff !important;
             z-index: 99;
+            box-shadow: 0 0 30px rgba(255,255,255,0.8);
         }
 
-        /* Party Colors */
-        .p-kmt { border-color: var(--neon-cyan); color: var(--neon-cyan); }
-        .p-dpp { border-color: var(--neon-green); color: var(--neon-green); }
-        .p-tpp { border-color: var(--neon-yellow); color: var(--neon-yellow); }
-        .p-ind { border-color: #888; color: #888; }
+        /* 陣營顏色定義 */
+        .kmt { border-color: var(--neon-blue); color: var(--neon-blue); }
+        .dpp { border-color: var(--neon-green); color: var(--neon-green); }
+        .tpp { border-color: var(--neon-yellow); color: var(--neon-yellow); }
+        .red { border-color: var(--neon-red); color: var(--neon-red); }
+        .ind { border-color: var(--neon-gray); color: var(--neon-gray); }
 
-        .unit-marker:hover.p-kmt, .unit-marker.active.p-kmt { background: var(--neon-cyan); color: #000; }
-        .unit-marker:hover.p-dpp, .unit-marker.active.p-dpp { background: var(--neon-green); color: #000; }
-        .unit-marker:hover.p-tpp, .unit-marker.active.p-tpp { background: var(--neon-yellow); color: #000; }
+        .unit-marker:hover.kmt { background: var(--neon-blue); color: #000; }
+        .unit-marker:hover.dpp { background: var(--neon-green); color: #000; }
+        .unit-marker:hover.tpp { background: var(--neon-yellow); color: #000; }
+        .unit-marker:hover.red { background: var(--neon-red); color: #000; }
+        .unit-marker:hover.ind { background: var(--neon-gray); color: #000; }
 
-        /* --- Info Panel (Right Side) --- */
+        /* --- 右側：資訊面板 --- */
         .info-panel {
             padding: 10px;
             display: flex;
@@ -268,169 +279,194 @@
         }
 
         .panel-header {
-            border-bottom: 1px solid #444;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
         }
 
         .char-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
+            font-size: 2.2rem;
             margin: 0;
-            line-height: 1;
+            line-height: 1.2;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
         .char-faction {
             font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            color: #888;
             margin-top: 5px;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .stat-row {
+        .faction-tag {
+            padding: 2px 8px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.1);
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .stat-box {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #333;
+            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(255,255,255,0.05);
-            padding: 10px;
-            border-left: 3px solid #555;
         }
 
-        .stat-label { font-size: 0.8rem; color: #aaa; }
-        .stat-value { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; }
+        .stat-label { font-size: 0.9rem; color: #aaa; }
+        .stat-value { font-size: 1.8rem; font-family: 'Orbitron', sans-serif; font-weight: 700; }
 
         .analysis-log {
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: #ccc;
-            height: 150px;
-            overflow-y: auto;
+            flex-grow: 1;
             border: 1px solid #333;
-            padding: 10px;
             background: #000;
-            font-family: 'Share Tech Mono', monospace;
-        }
-        
-        /* Typewriter cursor effect */
-        .typing-cursor::after {
-            content: '▋';
-            animation: blink 1s infinite;
-            color: var(--neon-cyan);
+            padding: 15px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #ddd;
+            overflow-y: auto;
+            position: relative;
+            min-height: 150px;
         }
 
+        /* 打字機游標 */
+        .cursor::after {
+            content: '▌';
+            animation: blink 1s infinite;
+            color: var(--neon-blue);
+            margin-left: 5px;
+        }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
         /* RWD */
         @media (max-width: 768px) {
             .hud-interface { grid-template-columns: 1fr; }
-            .spectrum-area { border-right: none; border-bottom: 1px dashed #333; }
+            .spectrum-area { border-right: none; border-bottom: 1px dashed #333; padding-bottom: 40px;}
+            h1 { font-size: 1.8rem; }
         }
-
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>Level 2026: Battle for Taiwan</h1>
+        <h1>2026 政治光譜戰略模擬</h1>
         <div class="system-status">
-            <span>SYSTEM: ONLINE</span>
-            <span>LOCATION: TW-SERVER</span>
-            <span>DATE: 2025-12-01</span>
+            <span>系統狀態：連線中</span>
+            <span>目標：兩岸定位分析</span>
         </div>
     </header>
 
+    <!-- 模式切換 -->
     <div class="mode-select">
-        <button class="mode-btn active" onclick="setMode('mayor', this)">MAYORAL CAMPAIGN</button>
-        <button class="mode-btn" onclick="setMode('legislator', this)">LEGISLATIVE ELITES</button>
+        <button class="mode-btn active" onclick="setMode('mayor', this)">2026 縣市長爭霸</button>
+        <button class="mode-btn" onclick="setMode('legislator', this)">國會立委大亂鬥</button>
     </div>
 
+    <!-- 子選單 (動態生成) -->
     <div class="zone-selector" id="zoneSelector">
-        <!-- JS populated -->
+        <!-- JS 填入內容 -->
     </div>
 
+    <!-- 主戰術面板 HUD -->
     <div class="hud-interface">
-        <!-- Left: Spectrum Map -->
+        <div class="hud-decor tl"></div><div class="hud-decor tr"></div>
+        <div class="hud-decor bl"></div><div class="hud-decor br"></div>
+
+        <!-- 左：光譜地圖 -->
         <div class="spectrum-area">
             <div class="axis-top">
-                <span style="color:var(--neon-magenta)">FACTION: RED (CN)</span>
-                <span style="color:#fff">STATUS QUO</span>
-                <span style="color:var(--neon-green)">FACTION: GREEN (TW)</span>
+                <span style="color:var(--neon-red)">◀ 親中 / 統派</span>
+                <span style="color:var(--neon-green)">抗中 / 獨派 ▶</span>
             </div>
             
-            <div class="spectrum-bar">
+            <div class="spectrum-track">
                 <div class="mid-line"></div>
+                <div class="mid-label">維持現狀 (ROC)</div>
                 <div id="unitContainer">
-                    <!-- Units spawn here -->
+                    <!-- 角色單位 JS 生成 -->
                 </div>
             </div>
 
-            <div style="text-align:center; font-size:0.8rem; color:#666; margin-top:40px;">
-                > DRAG UNITS TO SCAN... (JUST KIDDING, CLICK THEM)
+            <div style="text-align:center; font-size:0.8rem; color:#666; margin-top:50px;">
+                > 點擊戰術單位以讀取詳細情報 <
             </div>
         </div>
 
-        <!-- Right: Data Panel -->
-        <div class="info-panel" id="infoPanel" style="opacity:0.5; pointer-events:none;">
+        <!-- 右：情報分析 -->
+        <div class="info-panel" id="infoPanel" style="opacity:0.6; pointer-events:none;">
             <div class="panel-header">
-                <h2 class="char-name" id="pName">SELECT UNIT</h2>
-                <div class="char-faction" id="pFaction">WAITING FOR INPUT...</div>
+                <h2 class="char-name" id="pName">等待指令...</h2>
+                <div class="char-faction">
+                    <span class="faction-tag" id="pParty">陣營</span>
+                    <span id="pTitle">職位</span>
+                </div>
             </div>
 
-            <div class="stat-row" id="statBorder">
-                <span class="stat-label">POLITICAL ALIGNMENT</span>
+            <div class="stat-box" id="statBox">
+                <span class="stat-label">光譜座標定位 (0-100)</span>
                 <span class="stat-value" id="pScore">--</span>
             </div>
 
-            <div class="stat-row">
-                <span class="stat-label">THREAT LEVEL</span>
-                <span class="stat-value" style="color:red">HIGH</span>
-            </div>
-
-            <div style="margin-top:10px; color:#aaa; font-size:0.8rem;">LATEST TRANSMISSION:</div>
+            <div style="margin-top:10px; color:#aaa; font-size:0.85rem;">戰術分析日誌：</div>
             <div class="analysis-log" id="pLog">
-                <span class="typing-cursor"></span>
+                <span class="cursor"></span>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- DATABASE ---
-    // 修正：台北市移除黃珊珊，保留蔣萬安、王世堅、吳思瑤
+    // --- 戰情資料庫 ---
+    // score: 0(極紅) -> 50(中線) -> 100(極綠)
+    // 台北市：移除黃珊珊，保留蔣萬安(守)、王世堅(攻)、吳思瑤(攻)
+    // 立委：全混戰模式，不分區分組
     const db = {
         mayor: {
-            "TAIPEI CITY": [
-                { name: "CHIANG.W.A", fullName: "蔣萬安", party: "kmt", score: 42, text: "現任市長(Incumbent)。蔣家後代，為維持中間選票，對中態度保持『官方交流但不過度親近』。雙城論壇堅持舉辦，定位為藍營穩健派。" },
-                { name: "WANG.S.C", fullName: "王世堅", party: "dpp", score: 82, text: "挑戰者。柯學家/扶龍王。雖然在黨內是孤鳥，但反共立場極其堅定。若參選將主打『首都安全與反滲透』。" },
-                { name: "WU.S.Y", fullName: "吳思瑤", party: "dpp", score: 88, text: "挑戰者。民進黨團幹事長。緊跟賴清德路線，對藍白國會聯盟採高強度對抗，光譜屬於堅定台派。" }
+            "台北市戰區": [
+                { name: "蔣萬安", party: "kmt", score: 42, title: "現任市長", text: "蔣家政治傳人。為了守住首都市長寶座，極力維持中間形象，避免過度親中標籤，但堅持舉辦雙城論壇。戰略定位：藍營穩健派。" },
+                { name: "王世堅", party: "dpp", score: 82, title: "潛在挑戰者", text: "人稱「扶龍王」或「柯學家」。雖然常砲打黨內，但在反共立場上是絕對的鷹派。若出戰將主打「首都安全與反滲透」。" },
+                { name: "吳思瑤", party: "dpp", score: 88, title: "潛在挑戰者", text: "立院黨團幹事長，賴清德嫡系人馬。在國會第一線與藍白陣營激烈對抗，主權論述緊跟中央政府，光譜鮮明。" }
             ],
-            "NEW TAIPEI": [
-                { name: "HUNG.M.K", fullName: "洪孟楷", party: "kmt", score: 40, text: "藍營新生代戰將。遵循黨中央基調，強調九二共識精神。在國會對抗綠營砲火猛烈。" },
-                { name: "HUANG.K.C", fullName: "黃國昌", party: "tpp", score: 48, text: "民眾黨總召。為尋求藍白合，停止批判中國，將矛頭全數對準民進黨。實質光譜已位移至藍營側翼。" },
-                { name: "SU.C.H", fullName: "蘇巧慧", party: "dpp", score: 90, text: "蘇貞昌之女。本土派色彩濃厚，對於任何可能弱化台灣主權的論述皆強力反擊。" },
-                { name: "LIU.H.J", fullName: "劉和然", party: "kmt", score: 45, text: "侯友宜指定接班人。延續『中華民國派』與行政中立形象，避談統獨意識形態，極接近光譜中線。" }
+            "新北市戰區": [
+                { name: "洪孟楷", party: "kmt", score: 40, title: "藍營新星", text: "國民黨新生代戰將，國會聲量高。兩岸論述遵循黨中央基調，強調九二共識精神，並強烈抨擊民進黨的抗中牌。" },
+                { name: "黃國昌", party: "tpp", score: 48, title: "民眾黨總召", text: "為了尋求藍白合對抗執政黨，已大幅降低對中國的批判，將砲火全數對準民進黨。光譜實質位移至中線偏藍。" },
+                { name: "蘇巧慧", party: "dpp", score: 90, title: "綠營接班人", text: "蘇貞昌之女，本土派色彩濃厚。對於任何可能弱化台灣主權的論述皆採取強力反擊姿態。" },
+                { name: "劉和然", party: "kmt", score: 45, title: "現任副市長", text: "侯友宜指定接班人。延續侯的「中華民國派」與行政中立形象，避談統獨意識形態，戰略位置極接近光譜中線。" }
             ],
-            "KAOHSIUNG": [
-                { name: "KO.C.E", fullName: "柯志恩", party: "kmt", score: 46, text: "藍營智庫執行長。為在深綠選區生存，論述偏向『愛台灣、保和平』，淡化國民黨傳統統派色彩。" },
-                { name: "PAN.M.A", fullName: "潘孟安", party: "dpp", score: 92, text: "賴清德核心兄弟。草根性強，對抗中保台立場毫無保留，視為南台灣民主堡壘守護者。" }
+            "高雄市戰區": [
+                { name: "柯志恩", party: "kmt", score: 46, title: "藍營智庫", text: "為在深綠選區生存，論述偏向「愛台灣、保和平」，淡化國民黨傳統統派色彩，主打民生與建設。" },
+                { name: "潘孟安", party: "dpp", score: 92, title: "總統府秘書長", text: "賴清德核心兄弟。草根性強，對抗中保台立場毫無保留，被視為南台灣民主堡壘的守護者。" }
             ]
         },
         legislator: {
-            "BOSS: KMT": [
-                { name: "FU.K.C", fullName: "傅崐萁", party: "kmt", score: 15, text: "國民黨團總召/花蓮王。率團赴北京推動兩岸融合，立場極度親中(RED FACTION)。" },
-                { name: "HSU.C.H", fullName: "徐巧芯", party: "kmt", score: 36, text: "蜜獾/戰鬥藍。網路空戰強，主攻綠營弊案。雖口頭捍衛中華民國，但對中威脅輕描淡寫。" },
-                { name: "HAN.K.Y", fullName: "韓國瑜", party: "kmt", score: 35, text: "立法院長。九二共識堅定信仰者。目前維持議事中立形象，但核心價值偏向傳統藍營。" }
-            ],
-            "BOSS: DPP": [
-                { name: "SHEN.P.Y", fullName: "沈伯洋", party: "dpp", score: 98, text: "Puma/黑熊學院。資訊戰專家。視中國為生存威脅，主張極高強度的防禦與清洗紅色滲透。" },
-                { name: "WANG.T.Y", fullName: "王定宇", party: "dpp", score: 92, text: "國防外交鷹派。對共機擾台主張強力回擊，經常與藍營發生肢體或言語衝突。" },
-                { name: "HUANG.J", fullName: "黃捷", party: "dpp", score: 94, text: "年輕世代指標。對人權、主權議題極為敏感，立場屬於堅定的進步獨派。" }
+            "全立委混戰 (戰力排行)": [
+                { name: "傅崐萁", party: "red", score: 15, title: "國民黨團總召", text: "人稱「花蓮王」。率團赴北京會見政協主席，大力推動兩岸融合與經貿，在光譜上屬於極度親中(紅色)陣營。" },
+                { name: "翁曉玲", party: "red", score: 18, title: "國民黨立委", text: "法學學者，多次公開強調「我們是中國人」，並提案刪除退將赴中罰則，統派立場極其鮮明。" },
+                { name: "高金素梅", party: "ind", score: 12, title: "無黨籍立委", text: "長期與北京當局關係密切，多次獲中共高層接見。在國會的論述與北京立場高度一致，是反美疑美論述的代表。" },
+                { name: "韓國瑜", party: "kmt", score: 35, title: "立法院長", text: "九二共識的堅定信仰者。雖然擔任院長後維持議事中立形象，但核心價值偏向傳統深藍，主張兩岸定海神針。" },
+                { name: "徐巧芯", party: "kmt", score: 36, title: "戰鬥藍立委", text: "網路空戰強，主攻綠營弊案。雖口頭捍衛中華民國，但對中國軍事威脅輕描淡寫，主要精力用於攻擊本土派論述。" },
+                { name: "謝龍介", party: "kmt", score: 34, title: "國民黨立委", text: "台語戰神。反對激進台獨路線，主張兩岸應有深度的文化與經濟交流，強調「台獨做不到就是做不到」。" },
+                { name: "羅智強", party: "kmt", score: 38, title: "國民黨立委", text: "社群戰力強。論述主打捍衛中華民國憲法，並強力批判民進黨的「逢中必反」，主張對話取代對抗。" },
+                
+                // 中間 / 白
+                { name: "黃國昌", party: "tpp", score: 48, title: "民眾黨總召", text: "實質光譜已從昔日的太陽花反服貿，轉變為與國民黨高度合作的「藍白盟軍」，對中議題保持緘默。" },
+                
+                // 綠
+                { name: "柯建銘", party: "dpp", score: 85, title: "民進黨團總召", text: "立院老將，將藍白推動的國會擴權法案定調為「中共指導的亂台行為」，堅守本土陣線。" },
+                { name: "王定宇", party: "dpp", score: 92, title: "外交國防立委", text: "國防委員會鷹派。對共機擾台主張強力回擊，經常與藍營立委發生肢體或言語衝突，反共立場強硬。" },
+                { name: "黃捷", party: "dpp", score: 94, title: "民進黨立委", text: "年輕世代指標。對人權、主權議題極為敏感，立場屬於堅定的進步獨派，堅決反對任何形式的統一。" },
+                { name: "沈伯洋", party: "dpp", score: 98, title: "民進黨立委", text: "黑熊學院創辦人，資訊戰專家。視中國為最大生存威脅，主張極高強度的認知防禦與清洗紅色滲透，光譜極綠。" }
             ]
         }
     };
 
-    // --- GAME ENGINE ---
+    // --- 遊戲引擎 ---
     let currentMode = 'mayor';
     const unitContainer = document.getElementById('unitContainer');
     const infoPanel = document.getElementById('infoPanel');
@@ -439,43 +475,61 @@
 
     function setMode(mode, btn) {
         currentMode = mode;
+        // 更新按鈕狀態
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        
+        // 重新初始化區域
         initZones();
     }
 
     function initZones() {
         zoneSelector.innerHTML = '';
         const zones = Object.keys(db[currentMode]);
+        
+        // 若是立委模式，只有一個按鈕，可以自動點擊或隱藏
         zones.forEach((z, i) => {
-            const b = document.createElement('button');
+            const b = document.createElement('div');
             b.className = `zone-btn ${i===0?'active':''}`;
             b.innerText = z;
             b.onclick = () => loadZone(z, b);
             zoneSelector.appendChild(b);
         });
+        
+        // 自動載入第一個區域
         if(zones.length > 0) loadZone(zones[0], zoneSelector.children[0]);
     }
 
     function loadZone(zone, btn) {
-        // UI Reset
+        // UI 重置
         document.querySelectorAll('.zone-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         unitContainer.innerHTML = '';
-        infoPanel.style.opacity = '0.5';
+        infoPanel.style.opacity = '0.6';
+        infoPanel.style.pointerEvents = 'none'; // 鎖定直到點擊
         
         const units = db[currentMode][zone];
+        
+        // 渲染角色單位
         units.forEach((u, idx) => {
             const mk = document.createElement('div');
-            mk.className = `unit-marker p-${u.party}`;
+            // 根據黨籍賦予顏色 class
+            let colorClass = u.party;
+            if(u.party === 'red') colorClass = 'red'; // 親中陣營特殊色
+            
+            mk.className = `unit-marker ${colorClass}`;
             mk.style.left = `${u.score}%`;
             
-            // Stagger vertically
-            const offsets = [-40, 40, -80, 80, 0];
-            const y = offsets[idx % 5];
+            // 垂直錯位邏輯 (防止重疊)
+            // 立委人多，需要更多層次
+            const offsets = [-50, -25, 0, 25, 50, -65, 65]; 
+            const y = offsets[idx % offsets.length];
             mk.style.marginTop = `${y}px`;
             
-            mk.innerText = u.name.substring(0, 1); // Initial
+            // 顯示名字首字
+            mk.innerText = u.name.substring(0, 1);
+            
+            // 點擊事件
             mk.onclick = () => selectUnit(u, mk);
             
             unitContainer.appendChild(mk);
@@ -483,36 +537,54 @@
     }
 
     function selectUnit(u, el) {
-        // Activate UI
+        // 啟用面板
         document.querySelectorAll('.unit-marker').forEach(m => m.classList.remove('active'));
         el.classList.add('active');
         infoPanel.style.opacity = '1';
+        infoPanel.style.pointerEvents = 'auto';
 
-        // Set Data
-        document.getElementById('pName').innerText = u.name;
-        document.getElementById('pFaction').innerText = `${u.fullName} [${u.party.toUpperCase()}]`;
+        // 填入資料
+        const colors = { 
+            kmt:'var(--neon-blue)', 
+            dpp:'var(--neon-green)', 
+            tpp:'var(--neon-yellow)',
+            red:'var(--neon-red)',
+            ind:'var(--neon-gray)'
+        };
+        const activeColor = colors[u.party] || '#fff';
+
+        const pName = document.getElementById('pName');
+        pName.innerText = u.name;
+        pName.style.color = activeColor;
+        pName.style.textShadow = `0 0 15px ${activeColor}`;
+
+        const pParty = document.getElementById('pParty');
+        pParty.innerText = getPartyName(u.party);
+        pParty.style.color = activeColor;
+        pParty.style.border = `1px solid ${activeColor}`;
         
-        // Color coding
-        const colors = { kmt:'var(--neon-cyan)', dpp:'var(--neon-green)', tpp:'var(--neon-yellow)' };
-        const c = colors[u.party] || '#fff';
-        document.getElementById('pName').style.color = c;
-        document.getElementById('statBorder').style.borderLeftColor = c;
+        document.getElementById('pTitle').innerText = u.title;
+        document.getElementById('statBox').style.borderColor = activeColor;
 
-        // Animate Score
+        // 數字跑動特效
         const scoreEl = document.getElementById('pScore');
+        scoreEl.style.color = activeColor;
         let tempScore = 0;
-        const interval = setInterval(() => {
-            tempScore += 2;
-            scoreEl.innerText = tempScore + '%';
-            if(tempScore >= u.score) {
-                clearInterval(interval);
-                scoreEl.innerText = u.score + '/100';
-            }
-        }, 20);
+        const targetScore = u.score;
+        clearInterval(window.scoreInterval);
+        window.scoreInterval = setInterval(() => {
+            if(tempScore < targetScore) tempScore += 2;
+            else if(tempScore > targetScore) tempScore -= 2;
+            
+            if(Math.abs(tempScore - targetScore) < 2) tempScore = targetScore;
+            
+            scoreEl.innerText = tempScore;
+            if(tempScore === targetScore) clearInterval(window.scoreInterval);
+        }, 15);
 
-        // Typewriter Effect for Log
+        // 打字機特效
         const logEl = document.getElementById('pLog');
-        logEl.innerHTML = '<span class="typing-cursor"></span>';
+        logEl.innerHTML = '<span class="cursor"></span>';
         if(typingTimer) clearTimeout(typingTimer);
         
         let txt = u.text;
@@ -520,15 +592,24 @@
         
         function type() {
             if (charIndex < txt.length) {
-                logEl.innerHTML = txt.substring(0, charIndex + 1) + '<span class="typing-cursor"></span>';
+                logEl.innerHTML = txt.substring(0, charIndex + 1) + '<span class="cursor"></span>';
                 charIndex++;
-                typingTimer = setTimeout(type, 30); // Speed
+                typingTimer = setTimeout(type, 30); // 打字速度
             }
         }
         type();
     }
 
-    // Init
+    function getPartyName(code) {
+        if(code === 'kmt') return '國民黨陣營';
+        if(code === 'dpp') return '民進黨陣營';
+        if(code === 'tpp') return '民眾黨陣營';
+        if(code === 'red') return '親中/統派';
+        if(code === 'ind') return '無黨籍';
+        return '不明';
+    }
+
+    // 啟動初始化
     initZones();
 
 </script>
