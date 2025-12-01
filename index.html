@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 政治光譜 | POLITICAL RADAR</title>
+    
+    <!-- 引入高質感字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;700;900&family=Noto+Sans+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* 核心色盤 */
+            --bg-deep: #050505;
+            --glass-surface: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-muted: #888888;
+            
+            /* 霓虹強調色 */
+            --neon-red: #ff3b30;
+            --neon-blue: #007aff; 
+            --neon-green: #34c759;
+            --neon-cyan: #5ac8fa;
+            
+            /* 尺寸變數 */
+            --track-height: 4px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- 動態背景 (Aurora) --- */
+        .ambient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(0, 122, 255, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(52, 199, 89, 0.08), transparent 25%),
+                radial-gradient(circle at 50% 80%, rgba(255, 59, 48, 0.05), transparent 40%);
+            filter: blur(60px);
+            animation: auroraMove 20s infinite alternate;
+        }
+
+        @keyframes auroraMove {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* --- 主容器 --- */
+        .main-stage {
+            width: 100%;
+            max-width: 1400px; /* 更寬的視野 */
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        /* --- 標題區 --- */
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 5rem; /* 超大標題 */
+            letter-spacing: -2px;
+            margin: 0;
+            background: linear-gradient(180deg, #fff 0%, #666 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            color: var(--text-muted);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        /* --- 模式切換器 (Tab) --- */
+        .control-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+        }
+
+        .mode-tab {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding-bottom: 10px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .mode-tab:hover { color: #fff; }
+        .mode-tab.active {
+            color: #fff;
+            border-bottom-color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(90, 200, 250, 0.5);
+        }
+
+        /* --- 分類導航 (Pills) --- */
+        .nav-scroller {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .pill {
+            background: var(--glass-surface);
+            border: 1px solid var(--glass-border);
+            padding: 10px 24px;
+            border-radius: 4px; /* 方形圓角更具科技感 */
+            color: #aaa;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .pill:hover, .pill.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-color: rgba(255,255,255,0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* --- 光譜儀表板 (核心區) --- */
+        .radar-panel {
+            position: relative;
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 80px 60px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            margin-top: 20px;
+        }
+
+        /* 座標標示 */
+        .axis-labels {
+            display: flex;
+            justify-content: space-between;
+            position: absolute;
+            top: 30px; left: 60px; right: 60px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+        .label-red { color: var(--neon-red); text-shadow: 0 0 15px rgba(255, 59, 48, 0.4); }
+        .label-blue { color: var(--neon-blue); text-shadow: 0 0 15px rgba(0, 122, 255, 0.4); }
+        .label-green { color: var(--neon-green); text-shadow: 0 0 15px rgba(52, 199, 89, 0.4); }
+
+        /* 軌道 */
+        .spectrum-track {
+            position: relative;
+            height: 140px; /* 增加高度 */
+            display: flex;
+            align-items: center;
+        }
+
+        .track-line {
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                var(--neon-red) 0%, 
+                rgba(255,255,255,0.3) 45%,
+                rgba(255,255,255,0.8) 50%,
+                rgba(255,255,255,0.3) 55%, 
+                var(--neon-green) 100%);
+            position: relative;
+        }
+
+        /* 中線光束 */
+        .center-beam {
+            position: absolute;
+            left: 50%; top: -60px; bottom: -60px;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.5), transparent);
+            z-index: 0;
+        }
+
+        /* 節點 (Markers) */
+        .node {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.05);
+        }
+
+        /* 節點頭像 (預設隱藏，Hover顯示或做成永久顯示) - 這裡改為更簡潔的圓點設計 */
+        .node-avatar {
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #222;
+            border: 2px solid rgba(255,255,255,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+            opacity: 1; /* 保持顯示 */
+            transition: transform 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .node:hover .node-avatar, .node.active .node-avatar {
+            transform: translate(-50%, -50%) scale(1.25);
+            border-color: #fff;
+            z-index: 100;
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+        }
+
+        /* 呼吸動畫 */
+        .node::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.3);
+            animation: ripple 2s infinite;
+        }
+
+        @keyframes ripple {
+            0% { width: 100%; height: 100%; opacity: 1; }
+            100% { width: 300%; height: 300%; opacity: 0; }
+        }
+
+        .node-name {
+            position: absolute;
+            top: 40px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0.7;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .node:hover .node-name { opacity: 1; top: 45px; color: #fff; text-shadow: 0 0 10px white;}
+
+        /* --- 詳情 HUD (Heads-Up Display) --- */
+        .hud-panel {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 40px;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid var(--glass-border);
+            opacity: 0;
+            transform: translateY(20px);
+            /* JS 控制顯示 */
+        }
+        
+        .hud-panel.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .score-display {
+            text-align: right;
+            border-right: 1px solid var(--glass-border);
+            padding-right: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .big-number {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 5rem;
+            font-weight: 200;
+            line-height: 1;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(255,255,255,0.1);
+        }
+        
+        .score-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .info-display {
+            padding-left: 0;
+        }
+
+        .candidate-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .candidate-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .quote-box {
+            font-size: 1.2rem;
+            font-weight: 300;
+            font-style: italic;
+            color: #ddd;
+            border-left: 2px solid var(--neon-cyan);
+            padding-left: 20px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .analysis-box {
+            color: var(--text-muted);
+            line-height: 1.8;
+            font-size: 1rem;
+            max-width: 800px;
+        }
+
+        /* 顏色定義 */
+        .c-red { color: var(--neon-red); border-color: var(--neon-red); }
+        .c-blue { color: var(--neon-blue); border-color: var(--neon-blue); }
+        .c-green { color: var(--neon-green); border-color: var(--neon-green); }
+        .c-cyan { color: var(--neon-cyan); border-color: var(--neon-cyan); }
+        
+        .bg-red { background: rgba(255, 59, 48, 0.2); color: #ff8a80; }
+        .bg-blue { background: rgba(0, 122, 255, 0.2); color: #82b1ff; }
+        .bg-green { background: rgba(52, 199, 89, 0.2); color: #b9f6ca; }
+        .bg-cyan { background: rgba(90, 200, 250, 0.2); color: #80d8ff; }
+        .bg-ind { background: rgba(255, 255, 255, 0.1); color: #ccc; }
+
+        /* RWD */
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; }
+            .main-stage { padding: 20px; }
+            .radar-panel { padding: 40px 20px; }
+            .hud-panel { grid-template-columns: 1fr; text-align: left; border-top: none; }
+            .score-display { text-align: left; border-right: none; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px; margin-bottom: 20px; flex-direction: row; align-items: baseline; gap: 20px; }
+            .axis-labels { display: none; } /* 手機版隱藏文字避免擁擠 */
+        }
+    </style>
+</head>
+<body>
+
+<div class="ambient-bg"></div>
+
+<main class="main-stage">
+    <header>
+        <h1>Political Radar</h1>
+        <div class="subtitle">2026 Taiwan Election Spectrum Analysis</div>
+    </header>
+
+    <div class="control-bar">
+        <div class="mode-tab active" onclick="switchMode('mayor', this)">2026 縣市長</div>
+        <div class="mode-tab" onclick="switchMode('legislator', this)">熱門立委 (聲量榜)</div>
+    </div>
+
+    <div class="nav-scroller" id="categoryNav">
+        <!-- JS 生成按鈕 -->
+    </div>
+
+    <div class="radar-panel">
+        <div class="axis-labels">
+            <span class="label-red">PRO-CHINA (UNIFICATION)</span>
+            <span class="label-blue" style="text-align:center; left:0; right:0; position:absolute;">STATUS QUO (ROC)</span>
+            <span class="label-green">PRO-TAIWAN (INDEPENDENCE)</span>
+        </div>
+
+        <div class="spectrum-track">
+            <div class="center-beam"></div>
+            <div class="track-line"></div>
+            <div id="nodesContainer" style="position: absolute; width: 100%; height: 100%;">
+                <!-- JS 生成節點 -->
+            </div>
+        </div>
+
+        <!-- HUD 詳細資訊區 -->
+        <div class="hud-panel" id="hudPanel">
+            <div class="score-display">
+                <div class="big-number" id="hudScore">--</div>
+                <div class="score-label">Spectrum Index</div>
+            </div>
+            <div class="info-display">
+                <div class="candidate-header">
+                    <div class="candidate-title" id="hudName">Select a Candidate</div>
+                    <div class="tag" id="hudParty">PARTY</div>
+                </div>
+                <div class="quote-box" id="hudQuote">
+                    點擊上方光譜節點以查看候選人詳細分析數據。
+                </div>
+                <div class="analysis-box" id="hudAnalysis">
+                    數據基於 2024-2025 年間公開言論、兩岸政策立場及國會攻防紀錄綜合計算。
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // --- Data Source ---
+    const allData = {
+        mayor: {
+            "台北市": [
+                { name: "蔣萬安", party: "kmt", score: 42, quote: "雙城論壇是兩岸唯一官方交流管道，必須堅持下去。", analysis: "蔣家後代，立場正藍。為爭取中間選民，極力避免過度親中標籤，但堅持兩岸官方交流，定於藍營中線偏左。" },
+                { name: "黃珊珊", party: "tpp", score: 55, quote: "台灣是主權獨立國家，名叫中華民國。", analysis: "民眾黨籍，不強調九二共識，拒絕抗中路線。走『台灣民眾』路線，略偏台灣主體性。" },
+                { name: "王世堅", party: "dpp", score: 82, quote: "中共對台灣的野心從未停止，我們必須武裝自己。", analysis: "深綠台派，對中國態度極度不信任，立場鮮明。" },
+                { name: "吳思瑤", party: "dpp", score: 88, quote: "藍白聯手阻擋國防預算，就是弱化台灣保護力。", analysis: "賴清德派系人馬，強力對抗藍白國會聯盟，光譜屬於堅定台派。" }
+            ],
+            "新北市": [
+                { name: "洪孟楷", party: "kmt", score: 40, quote: "民進黨只會賣芒果乾，兩岸和平才是重點。", analysis: "國民黨新生代，遵循黨中央基調，強調九二共識精神與交流。" },
+                { name: "黃國昌", party: "tpp", score: 48, quote: "民進黨不要再用抗中保台來掩飾執政無能。", analysis: "雖出身太陽花，但近期與國民黨高度合作且停止批判中國。光譜移至中線偏藍。" },
+                { name: "蘇巧慧", party: "dpp", score: 90, quote: "台灣與中國互不隸屬是客觀事實。", analysis: "承襲蘇貞昌強硬本土風格，對任何弱化主權論述皆強力反擊。" },
+                { name: "劉和然", party: "kmt", score: 45, quote: "侯友宜市長的路線，就是中華民國這塊招牌。", analysis: "侯友宜接班人，延續不沾鍋路線，避談意識形態，極接近中線。" }
+            ],
+            "台中市": [
+                { name: "江啟臣", party: "kmt", score: 48, quote: "我是台灣人也是中國人；中華民國是最大公約數。", analysis: "國民黨親美派，論述貼近美方，相對不親中，極接近中線。" },
+                { name: "楊瓊瓔", party: "kmt", score: 38, quote: "兩岸要貨暢其流，農產品要賣得出去。", analysis: "傳統地方派系，重經貿紅利，少談國安風險，偏傳統藍。" },
+                { name: "何欣純", party: "dpp", score: 80, quote: "守護台灣民主自由，寸步不讓。", analysis: "基層實力雄厚，立場穩固站在台灣本土派。" }
+            ],
+            "高雄市": [
+                { name: "柯志恩", party: "kmt", score: 46, quote: "愛台灣不是民進黨的專利。", analysis: "為在深綠選區突圍，淡化統派色彩，強調在地建設，走淺藍中間路線。" },
+                { name: "潘孟安", party: "dpp", score: 92, quote: "紅色滲透無孔不入，南台灣是民主堡壘。", analysis: "賴清德核心，草根意識強，對抗中議題極為強硬，光譜極綠。" }
+            ]
+        },
+        legislator: {
+            "國民黨團 (KMT)": [
+                { name: "傅崐萁", party: "kmt", score: 15, quote: "兩岸同文同種，要讓觀光客進來。", analysis: "黨團總召，率團赴北京會見政協主席，推動兩岸融合，立場極度親中。" },
+                { name: "翁曉玲", party: "kmt", score: 18, quote: "我們就是中國人，這有什麼不對？", analysis: "強調中國人認同，提案刪除退將赴中罰則，政治光譜極左。" },
+                { name: "徐巧芯", party: "kmt", score: 36, quote: "抗中保台是假議題，弊案才是真問題。", analysis: "網路聲量王。雖強調中華民國，但主力攻擊綠營抗中論述，定位深藍。" },
+                { name: "羅智強", party: "kmt", score: 38, quote: "兩岸要對話，不要對抗；要和平，不要戰爭。", analysis: "論述主打捍衛中華民國憲法，並強力批判民進黨的『逢中必反』。" },
+                { name: "謝龍介", party: "kmt", score: 33, quote: "台獨做不到就是做不到。", analysis: "台語戰神，深耕台南。反對激進台獨路線，主張兩岸應有深度的文化與經濟交流。" }
+            ],
+            "民進黨團 (DPP)": [
+                { name: "沈伯洋", party: "dpp", score: 98, quote: "中國的認知作戰已經滲透到你我的Line群組。", analysis: "黑熊學院創辦人，專研資訊戰。視中國為最大威脅，主張極高強度防禦。" },
+                { name: "黃捷", party: "dpp", score: 94, quote: "台灣的民主自由是年輕世代的底線。", analysis: "年輕世代指標人物，對於人權、主權議題極為敏感，立場屬於堅定的進步獨派。" },
+                { name: "柯建銘", party: "dpp", score: 85, quote: "國民黨正在配合中共沒收台灣的民主。", analysis: "立院老將，將國會擴權法案定調為中共指導的亂台行為，堅守本土陣線。" },
+                { name: "王定宇", party: "dpp", score: 92, quote: "共機擾台，我們絕對有能力讓它有來無回。", analysis: "國防委員會鷹派，對中國軍事威脅採取絕對強硬態度。" }
+            ],
+            "民眾黨 / 無黨": [
+                { name: "黃國昌", party: "tpp", score: 48, quote: "民進黨不要再賣芒果乾，請面對司法改革。", analysis: "黨團總召。為與藍營結盟，大幅降低對中批判聲量，光譜實質往中線靠攏。" },
+                { name: "黃珊珊", party: "tpp", score: 55, quote: "台灣的主體性不容挑戰，但我們需要溝通。", analysis: "前台北市副市長。路線較溫和，試圖在統獨之外尋找務實的中間路線。" },
+                { name: "高金素梅", party: "ind", score: 10, quote: "我們要跟中國大陸一家親，不要當美國的棋子。", analysis: "長期與北京關係密切，論述與北京立場高度一致，光譜為立院中最紅之一。" }
+            ]
+        }
+    };
+
+    // --- Variables ---
+    const nodesContainer = document.getElementById('nodesContainer');
+    const hudPanel = document.getElementById('hudPanel');
+    const categoryNav = document.getElementById('categoryNav');
+    let currentMode = 'mayor';
+
+    // --- Core Functions ---
+    function switchMode(mode, el) {
+        currentMode = mode;
+        document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        renderCategories();
+    }
+
+    function renderCategories() {
+        categoryNav.innerHTML = '';
+        const cats = Object.keys(allData[currentMode]);
+        
+        cats.forEach((cat, idx) => {
+            const btn = document.createElement('div');
+            btn.className = `pill ${idx===0 ? 'active' : ''}`;
+            btn.innerText = cat;
+            btn.onclick = () => loadCategory(cat, btn);
+            categoryNav.appendChild(btn);
+        });
+
+        if(cats.length > 0) loadCategory(cats[0], categoryNav.children[0]);
+    }
+
+    function loadCategory(cat, btn) {
+        // UI Reset
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        nodesContainer.innerHTML = '';
+        hudPanel.classList.remove('visible');
+
+        const people = allData[currentMode][cat];
+        
+        // Render Nodes
+        people.forEach((p, i) => {
+            const node = document.createElement('div');
+            node.className = 'node';
+            node.style.left = `${p.score}%`;
+            
+            // Vertical Staggering (Cyberpunk logic)
+            // Use sinusoidal distribution or simple stagger
+            const offset = (i % 2 === 0) ? -25 : 25;
+            // Add a bit more randomness for aesthetics
+            const randomJitter = (Math.random() * 10) - 5;
+            
+            // Create inner avatar
+            const avatar = document.createElement('div');
+            avatar.className = 'node-avatar';
+            avatar.innerText = p.name.substr(p.name.length-1, 1); // Last char
+            
+            // Set Color Class
+            if(p.party === 'kmt') avatar.style.borderColor = 'var(--neon-blue)';
+            if(p.party === 'dpp') avatar.style.borderColor = 'var(--neon-green)';
+            if(p.party === 'tpp') avatar.style.borderColor = 'var(--neon-cyan)';
+            if(p.party === 'ind') avatar.style.borderColor = '#ccc';
+
+            // Apply styles
+            node.style.marginTop = `${offset + randomJitter}px`;
+            
+            // Append
+            node.appendChild(avatar);
+            
+            // Name Label
+            const label = document.createElement('div');
+            label.className = 'node-name';
+            label.innerText = p.name;
+            node.appendChild(label);
+
+            // Interaction
+            node.onclick = () => updateHUD(p, node);
+
+            nodesContainer.appendChild(node);
+        });
+    }
+
+    function updateHUD(data, nodeEl) {
+        // Highlight Node
+        document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
+        nodeEl.classList.add('active');
+
+        // Populate Data
+        const colors = { 
+            kmt: {class: 'bg-blue', hex: 'var(--neon-blue)'}, 
+            dpp: {class: 'bg-green', hex: 'var(--neon-green)'}, 
+            tpp: {class: 'bg-cyan', hex: 'var(--neon-cyan)'}, 
+            ind: {class: 'bg-ind', hex: '#ccc'}
+        };
+        const style = colors[data.party] || colors.ind;
+        const partyName = data.party === 'ind' ? '無黨籍' : data.party.toUpperCase();
+
+        document.getElementById('hudName').innerText = data.name;
+        document.getElementById('hudName').style.color = style.hex;
+        
+        const badge = document.getElementById('hudParty');
+        badge.innerText = partyName;
+        badge.className = `tag ${style.class}`;
+
+        document.getElementById('hudQuote').innerText = `"${data.quote}"`;
+        document.getElementById('hudQuote').style.borderLeftColor = style.hex;
+        
+        document.getElementById('hudAnalysis').innerText = data.analysis;
+
+        // Animate Number
+        animateValue('hudScore', parseInt(document.getElementById('hudScore').innerText) || 0, data.score, 800);
+
+        // Show Panel
+        hudPanel.classList.add('visible');
+    }
+
+    function animateValue(id, start, end, duration) {
+        if (start === end) return;
+        const range = end - start;
+        let current = start;
+        const increment = end > start ? 1 : -1;
+        const stepTime = Math.abs(Math.floor(duration / range));
+        const obj = document.getElementById(id);
+        
+        // Simple easing fallback for small ranges
+        const timer = setInterval(() => {
+            current += increment;
+            obj.innerHTML = current;
+            if (current == end) {
+                clearInterval(timer);
+            }
+        }, Math.max(stepTime, 10)); // Min 10ms
+    }
+
+    // Init
+    renderCategories();
+
+</script>
+</body>
+</html>
