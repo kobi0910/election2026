@@ -1,34 +1,28 @@
-<!-- 
-    檔案結構說明：
-    1. HTML 結構 (第 15 行起)
-    2. CSS 樣式 (第 60 行起)
-    3. JavaScript 邏輯 (第 260 行起)
--->
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 Political Spectrum - Compact Edition</title>
+    <title>2026 Political Spectrum (Fixed)</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
-    
-    <!-- =========================================
-         CSS 樣式區 (可存為 style.css)
-         ========================================= -->
+
+    <!-- =================================================================
+         1. CSS 樣式表 (如果您要分開檔案，請將此區塊存為 style.css)
+         ================================================================= -->
     <style>
         :root {
-            --bg-color: #0b0c10;
-            --panel-bg: #1f2833;
-            --text-main: #c5c6c7;
-            --acid-green: #66fcf1;
+            /* 基礎色調 */
+            --bg-color: #050505;
+            --panel-bg: #0f0f0f;
+            --text-main: #e0e0e0;
+            --grid-line: #222;
             
-            /* 陣營色 (高亮螢光版) */
-            --p-kmt: #45a29e;   /* 藍青色 */
-            --p-dpp: #5be7a9;   /* 螢光綠 */
-            --p-tpp: #f2a900;   /* 黃色 */
-            --p-red: #ff2e63;   /* 霓虹紅 */
-            --p-ind: #c5c6c7;   /* 灰白 */
+            /* 陣營色 (高亮螢光版 - 確保在黑底上看得到) */
+            --p-kmt: #00b0ff;   /* 亮藍 */
+            --p-dpp: #00e676;   /* 螢光綠 */
+            --p-tpp: #ffea00;   /* 亮黃 */
+            --p-red: #ff1744;   /* 螢光紅 */
+            --p-ind: #bdbdbd;   /* 亮灰 */
         }
 
         * { box-sizing: border-box; }
@@ -44,18 +38,19 @@
             flex-direction: column;
         }
 
-        /* 背景網格 (調亮一點點，但保持低調) */
+        /* 背景網格 (亮一點) */
         .bg-grid {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-image: 
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
             background-size: 40px 40px;
-            z-index: -1;
+            z-index: 0;
+            opacity: 0.6;
         }
 
-        /* 頂部導航 */
+        /* 頂部 Header */
         header {
             height: 50px;
             border-bottom: 1px solid #333;
@@ -63,28 +58,29 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
-            background: rgba(11, 12, 16, 0.9);
+            background: rgba(5,5,5,0.95);
             z-index: 100;
         }
 
         .brand {
             font-family: 'JetBrains Mono', monospace;
             font-weight: 900;
+            font-size: 1.1rem;
             color: #fff;
             letter-spacing: -1px;
         }
-        .brand span { color: var(--acid-green); }
 
-        /* 主介面佈局 */
+        /* 主畫面分割 */
         .main-interface {
             display: flex;
             flex: 1;
             height: calc(100vh - 50px);
+            z-index: 10;
         }
 
-        /* 左側：視覺區 */
+        /* 左側：操作與視覺區 */
         .viz-zone {
-            flex: 3;
+            flex: 3; /* 佔 75% */
             position: relative;
             border-right: 1px solid #333;
             display: flex;
@@ -96,30 +92,30 @@
             display: flex;
             gap: 10px;
             border-bottom: 1px solid #333;
-            background: rgba(11,12,16,0.8);
+            background: rgba(10,10,10,0.9);
             align-items: center;
         }
 
         .btn-mode {
-            background: #000;
+            background: #111;
             border: 1px solid #444;
             color: #888;
-            padding: 5px 12px;
+            padding: 6px 14px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.75rem;
             cursor: pointer;
             transition: 0.2s;
         }
-        .btn-mode.active {
-            background: var(--acid-green);
+        .btn-mode:hover, .btn-mode.active {
+            background: #fff;
             color: #000;
-            border-color: var(--acid-green);
+            border-color: #fff;
             font-weight: 700;
         }
 
         .sub-nav-scroll {
             display: flex;
-            gap: 5px;
+            gap: 8px;
             overflow-x: auto;
             margin-left: 10px;
         }
@@ -130,11 +126,11 @@
             color: #888;
             cursor: pointer;
             white-space: nowrap;
-            border-radius: 2px;
+            border-radius: 4px;
         }
-        .sub-pill.active { border-color: #fff; color: #fff; background: #222; }
+        .sub-pill:hover, .sub-pill.active { border-color: #888; color: #fff; background: #222; }
 
-        /* 軌道容器 */
+        /* 軌道區塊 */
         .track-container {
             flex: 1;
             position: relative;
@@ -142,154 +138,150 @@
             align-items: center;
             justify-content: center;
             padding: 0 5%;
-            /* 限制高度範圍，避免人物飛太遠 */
-            max-height: 100%; 
         }
 
-        /* 彩色漸層軌道 */
+        /* 光譜軸線 (紅>藍>綠) */
         .axis-line {
             width: 100%;
-            height: 4px; 
+            height: 6px; 
             position: relative;
-            border-radius: 2px;
+            border-radius: 3px;
             background: linear-gradient(90deg, 
                 var(--p-red) 0%, 
                 var(--p-kmt) 45%, 
                 var(--p-kmt) 55%, 
                 var(--p-dpp) 100%);
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-shadow: 0 0 20px rgba(0,0,0,0.6);
+            z-index: 5;
         }
 
         .axis-label {
             position: absolute;
-            top: -20px;
+            top: -25px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
         }
         .label-left { left: 0; color: var(--p-red); }
-        .label-mid { left: 50%; transform: translateX(-50%); color: #fff; }
+        .label-mid { left: 50%; transform: translateX(-50%); color: #fff; text-shadow: 0 0 5px #000;}
         .label-right { right: 0; color: var(--p-dpp); }
 
-        /* 節點組 */
+        /* 節點定位容器 (絕對定位在軌道上) */
         .node-group {
             position: absolute;
             top: 50%;
             width: 1px;
-            height: 0;
+            height: 0; /* 高度為0，往上下延伸 */
             display: flex;
             justify-content: center;
+            /* 讓節點顯示在軸線上方 */
+            z-index: 20; 
         }
 
-        /* 連接線 (更亮，且更短) */
+        /* 連接線 (更亮) */
         .connector {
             position: absolute;
             width: 1px;
-            background: #fff; /* 純白高亮 */
-            box-shadow: 0 0 5px rgba(255,255,255,0.8);
-            z-index: 1;
+            background: #fff;
+            box-shadow: 0 0 4px #fff; /* 發光效果 */
+            z-index: 10;
             opacity: 0.8;
         }
 
-        /* 頭像容器 */
+        /* 頭像按鈕 */
         .avatar-node {
             position: absolute;
-            width: 36px; height: 36px;
+            width: 38px; height: 38px;
             border-radius: 50%;
-            background-color: #222;
+            background-color: #222; /* 預設深色底 */
             border: 2px solid #fff;
             cursor: pointer;
-            z-index: 10;
+            z-index: 30; /* 最高層級，確保可點擊 */
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+            
+            /* 文字居中 (當沒有圖片時) */
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fff;
+            overflow: hidden; /* 切掉超出的圖片 */
         }
 
         .avatar-node img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
-        }
-        
-        /* 圖片載入失敗時的文字備案 */
-        .fallback-text {
-            position: absolute;
-            width: 100%; height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #333;
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.8rem;
+            display: none; /* 預設隱藏，載入成功後 JS 開啟 */
         }
 
         .avatar-node:hover {
             transform: scale(1.4);
             z-index: 100;
             border-color: #fff !important;
-            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+            box-shadow: 0 0 15px rgba(255,255,255,0.6);
         }
 
         .avatar-node.active {
             z-index: 99;
             transform: scale(1.2);
-            box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.2);
         }
 
-        /* 黨籍邊框 */
-        .b-kmt { border-color: var(--p-kmt); }
-        .b-dpp { border-color: var(--p-dpp); }
-        .b-tpp { border-color: var(--p-tpp); }
-        .b-red { border-color: var(--p-red); }
-        .b-ind { border-color: var(--p-ind); }
+        /* 黨籍邊框色 */
+        .b-kmt { border-color: var(--p-kmt); color: var(--p-kmt); }
+        .b-dpp { border-color: var(--p-dpp); color: var(--p-dpp); }
+        .b-tpp { border-color: var(--p-tpp); color: var(--p-tpp); }
+        .b-red { border-color: var(--p-red); color: var(--p-red); }
+        .b-ind { border-color: var(--p-ind); color: var(--p-ind); }
 
-        /* 右側：儀表板 */
+        /* 右側：資訊面板 */
         .info-zone {
             flex: 1;
             background: var(--panel-bg);
             border-left: 1px solid #333;
-            padding: 25px;
+            padding: 30px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
+            z-index: 50;
         }
 
-        .char-name { font-size: 1.8rem; font-weight: 900; margin: 0; color: #fff; }
+        .char-name { font-size: 2rem; font-weight: 900; margin: 0; color: #fff; }
         .meta-tag {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.65rem;
-            padding: 3px 6px;
-            background: #0b0c10;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            background: #111;
             color: #fff;
             border: 1px solid #444;
             display: inline-block;
         }
         .score-val { font-family: 'JetBrains Mono', monospace; font-size: 3rem; font-weight: 700; color: #fff; }
-        .analysis-block { color: #aaa; font-size: 0.85rem; line-height: 1.6; }
+        .analysis-block { color: #aaa; font-size: 0.9rem; line-height: 1.6; }
 
         @media (max-width: 768px) {
             .main-interface { flex-direction: column; overflow: auto; }
             .viz-zone { height: 50vh; border-right: none; border-bottom: 1px solid #333; }
-            .track-container { padding: 0 20px; }
         }
     </style>
 </head>
 <body>
 
-<!-- HTML 結構區 -->
+<!-- =================================================================
+     2. HTML 結構區
+     ================================================================= -->
 <div class="bg-grid"></div>
 
 <header>
-    <div class="brand">2026<span>_COMPACT</span></div>
+    <div class="brand">2026_SPECTRUM_V3</div>
 </header>
 
 <div class="main-interface">
+    <!-- 左側視覺區 -->
     <div class="viz-zone">
         <div class="control-bar">
             <button class="btn-mode active" onclick="switchMode('mayor', this)">縣市長</button>
@@ -303,75 +295,68 @@
                 <span class="axis-label label-mid">中華民國 (BLUE)</span>
                 <span class="axis-label label-right">台灣本土 (GREEN)</span>
             </div>
-            <!-- 這是放置節點的圖層 -->
-            <div id="nodesLayer" style="position: absolute; width: 90%; height: 100%;"></div>
+            <!-- 節點層 -->
+            <div id="nodesLayer" style="position: absolute; width: 90%; height: 100%; top:0; left:5%; pointer-events:none;">
+                <!-- 節點由 JS 動態產生 -->
+            </div>
         </div>
     </div>
 
+    <!-- 右側資訊區 -->
     <div class="info-zone" id="infoPanel">
         <div>
-            <h1 class="char-name" id="pName">SELECT</h1>
+            <h1 class="char-name" id="pName">SELECT UNIT</h1>
             <div style="margin-top:10px;">
                 <span class="meta-tag" id="pParty">---</span>
                 <span class="meta-tag" id="pTitle">---</span>
             </div>
         </div>
         <div>
-            <div style="font-size:0.65rem; color:#666; margin-bottom:5px;">POLITICAL INDEX</div>
+            <div style="font-size:0.7rem; color:#666; margin-bottom:5px;">POLITICAL INDEX</div>
             <div class="score-val" id="pScore">--</div>
         </div>
         <div>
-            <div style="font-size:0.65rem; color:#666; margin-bottom:5px;">TACTICAL ANALYSIS</div>
+            <div style="font-size:0.7rem; color:#666; margin-bottom:5px;">ANALYSIS</div>
             <p class="analysis-block" id="pAnalysis">
-                請點擊左側頭像查看詳細數據。<br>
+                請點擊左側軌道上的人物按鈕查看詳細資料。
             </p>
         </div>
     </div>
 </div>
 
-<!-- =========================================
-     JavaScript 邏輯區 (可存為 script.js)
-     ========================================= -->
+<!-- =================================================================
+     3. JavaScript 邏輯區 (如果您要分開檔案，請將此區塊存為 script.js)
+     ================================================================= -->
 <script>
-    // 圖片庫 (使用較穩定的來源，若失效會自動顯示文字)
+    // 圖片連結 (使用相對穩定的新聞或公開圖源)
     const imgDb = {
-        "蔣萬安": "https://img.ltn.com.tw/Upload/news/600/2023/08/29/phpN12J1F.jpg",
-        "王世堅": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Wang_Shih-chien_at_Tapei_City_Council_20190523_%28cropped%29.jpg/220px-Wang_Shih-chien_at_Tapei_City_Council_20190523_%28cropped%29.jpg",
-        "吳思瑤": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Wu_Szu-yao_2024.jpg/220px-Wu_Szu-yao_2024.jpg",
-        "黃國昌": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Huang_Kuo-chang_in_March_2024.jpg/220px-Huang_Kuo-chang_in_March_2024.jpg",
-        "柯建銘": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Ker_Chien-ming_Legislative_Yuan.jpg/220px-Ker_Chien-ming_Legislative_Yuan.jpg",
-        "韓國瑜": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Han_Kuo-yu_official_portrait.jpg/220px-Han_Kuo-yu_official_portrait.jpg",
-        "徐巧芯": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Hsu_Chiao-hsin_at_Taipei_City_Council_20201016.jpg/220px-Hsu_Chiao-hsin_at_Taipei_City_Council_20201016.jpg",
-        "沈伯洋": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Puma_Shen_2024.jpg/220px-Puma_Shen_2024.jpg",
-        "黃捷": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Huang_Jie_in_2024.jpg/220px-Huang_Jie_in_2024.jpg",
-        "李四川": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Lee_Sichuan_2023.jpg/220px-Lee_Sichuan_2023.jpg",
-        "蘇巧慧": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Su_Chiao-hui_in_April_2024.jpg/220px-Su_Chiao-hui_in_April_2024.jpg",
-        "傅崐萁": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Fu_Kun-chi_LY.jpg/220px-Fu_Kun-chi_LY.jpg",
-        "高金素梅": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Kao_Chin_Su-mei_2023.jpg/220px-Kao_Chin_Su-mei_2023.jpg",
-        "王定宇": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Wang_Ting-yu_LY.jpg/220px-Wang_Ting-yu_LY.jpg",
-        "林俊憲": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Lin_Chun-hsien_LY.jpg/220px-Lin_Chun-hsien_LY.jpg",
-        "陳亭妃": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Chen_Ting-fei_LY.jpg/220px-Chen_Ting-fei_LY.jpg",
-        "謝龍介": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Hsieh_Lung-chieh_01.jpg/220px-Hsieh_Lung-chieh_01.jpg",
-        "洪孟楷": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Hung_Mong-kai_2023.jpg/220px-Hung_Mong-kai_2023.jpg",
-        "江啟臣": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Johnny_Chiang_in_May_2024.jpg/220px-Johnny_Chiang_in_May_2024.jpg",
-        "羅智強": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Lo_Chih-chiang_2023.jpg/220px-Lo_Chih-chiang_2023.jpg",
-        "柯志恩": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Ko_Chih-en_in_July_2023.jpg/220px-Ko_Chih-en_in_July_2023.jpg",
-        "許智傑": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Hsu_Chih-chieh_LY.jpg/220px-Hsu_Chih-chieh_LY.jpg",
-        "賴瑞隆": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Lai_Jui-lung_LY.jpg/220px-Lai_Jui-lung_LY.jpg",
-        "林右昌": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Lin_Yu-chang_2023.jpg/220px-Lin_Yu-chang_2023.jpg",
-        "劉和然": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Liu_Ho-jan_2023.jpg/220px-Liu_Ho-jan_2023.jpg",
-        "黃珊珊": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Huang_Shan-shan_in_January_2024.jpg/220px-Huang_Shan-shan_in_January_2024.jpg",
-        "翁曉玲": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Weng_Hsiao-ling_in_February_2024.jpg/220px-Weng_Hsiao-ling_in_February_2024.jpg",
-        "王鴻薇": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Wang_Hung-wei_in_December_2022.jpg/220px-Wang_Hung-wei_in_December_2022.jpg",
-        "范雲": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Fan_Yun_LY.jpg/220px-Fan_Yun_LY.jpg",
-        "林岱樺": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Lin_Tai-hua_LY.jpg/220px-Lin_Tai-hua_LY.jpg"
+        "蔣萬安": "https://img.ltn.com.tw/Upload/news/600/2022/11/10/phpM3XwTz.jpg",
+        "王世堅": "https://img.ltn.com.tw/Upload/news/600/2023/06/15/phpJv5yqG.jpg",
+        "吳思瑤": "https://img.ltn.com.tw/Upload/news/600/2024/02/26/php8e3vDa.jpg",
+        "李四川": "https://img.ltn.com.tw/Upload/news/600/2023/06/22/php5qGq4a.jpg",
+        "蘇巧慧": "https://img.ltn.com.tw/Upload/news/600/2023/04/19/php8x3yZ2.jpg",
+        "洪孟楷": "https://img.ltn.com.tw/Upload/news/600/2023/05/17/php0s7a4d.jpg",
+        "黃國昌": "https://img.ltn.com.tw/Upload/news/600/2023/11/16/phpQ5r4aA.jpg",
+        "韓國瑜": "https://img.ltn.com.tw/Upload/news/600/2024/02/01/php9w2e3r.jpg",
+        "柯建銘": "https://img.ltn.com.tw/Upload/news/600/2024/01/15/php6t7y8u.jpg",
+        "徐巧芯": "https://img.ltn.com.tw/Upload/news/600/2023/04/22/php2q3w4e.jpg",
+        "沈伯洋": "https://img.ltn.com.tw/Upload/news/600/2023/11/15/php4r5t6y.jpg",
+        "黃捷": "https://img.ltn.com.tw/Upload/news/600/2023/08/08/php7u8i9o.jpg",
+        "謝龍介": "https://img.ltn.com.tw/Upload/news/600/2022/09/03/php1a2s3d.jpg",
+        "高金素梅": "https://img.ltn.com.tw/Upload/news/600/2019/06/28/php8h7g6f.jpg",
+        "傅崐萁": "https://img.ltn.com.tw/Upload/news/600/2024/01/22/php5d4f3g.jpg",
+        "柯志恩": "https://img.ltn.com.tw/Upload/news/600/2022/07/11/php9j8k7l.jpg",
+        "陳亭妃": "https://img.ltn.com.tw/Upload/news/600/2023/04/26/php3x2c1v.jpg",
+        "林俊憲": "https://img.ltn.com.tw/Upload/news/600/2023/03/24/php6b5n4m.jpg",
+        "王定宇": "https://img.ltn.com.tw/Upload/news/600/2021/03/18/php7m8k9l.jpg"
     };
 
+    // 資料庫
     const db = {
         mayor: {
             "台北": [
-                { name: "蔣萬安", party: "kmt", score: 42, title: "現任市長", analysis: "蔣家後代。藍營共主，維持官方交流但避開統獨爭議，走穩健路線。" },
-                { name: "王世堅", party: "dpp", score: 82, title: "潛在挑戰者", analysis: "柯黑大將，在抗中議題上是絕對的鷹派。" },
+                { name: "蔣萬安", party: "kmt", score: 42, title: "現任市長", analysis: "蔣家後代。藍營共主，維持官方交流但避開過度親中爭議。" },
+                { name: "王世堅", party: "dpp", score: 82, title: "潛在挑戰者", analysis: "柯黑大將，反共立場極其鮮明。" },
                 { name: "吳思瑤", party: "dpp", score: 88, title: "立委", analysis: "賴系嫡系，國會攻防主將，抗中立場強硬。" }
             ],
             "新北": [
@@ -387,11 +372,6 @@
                 { name: "何欣純", party: "dpp", score: 80, title: "立委", analysis: "全國最高票立委，標準台派。" },
                 { name: "蔡其昌", party: "dpp", score: 82, title: "立委", analysis: "深耕台中，反中立場明確。" }
             ],
-            "台南": [
-                { name: "謝龍介", party: "kmt", score: 35, title: "立委", analysis: "反對激進台獨，主張兩岸深度交流。" },
-                { name: "林俊憲", party: "dpp", score: 92, title: "立委", analysis: "賴清德嫡系大弟子，抗中路線無懸念。" },
-                { name: "陳亭妃", party: "dpp", score: 85, title: "立委", analysis: "正國會成員，強調正常國家化。" }
-            ],
             "高雄": [
                 { name: "柯志恩", party: "kmt", score: 46, title: "立委", analysis: "淡化統派色彩，主打民生與教育，走淺藍路線。" },
                 { name: "賴瑞隆", party: "dpp", score: 88, title: "立委", analysis: "菊系，強調產業去紅色風險。" },
@@ -406,7 +386,7 @@
                 { name: "陳玉珍", party: "kmt", score: 20, title: "立委", analysis: "金門立委，主張金廈共同生活圈。" },
                 { name: "馬文君", party: "kmt", score: 25, title: "立委", analysis: "阻擋潛艦國造，被質疑削弱國防。" },
                 { name: "賴士葆", party: "kmt", score: 30, title: "立委", analysis: "資深藍營，堅守傳統九二共識。" },
-                { name: "謝龍介", party: "kmt", score: 34, title: "立委", analysis: "主張和平交流，反對台獨。" },
+                { name: "謝龍介", party: "kmt", score: 34, title: "立委", analysis: "台語戰神，主張和平交流。" },
                 { name: "韓國瑜", party: "kmt", score: 35, title: "院長", analysis: "核心信仰偏向深藍，九二共識信徒。" },
                 { name: "徐巧芯", party: "kmt", score: 36, title: "立委", analysis: "戰鬥藍，主攻弊案，懷疑抗中論述。" },
                 { name: "王鴻薇", party: "kmt", score: 37, title: "立委", analysis: "揭弊優先，對中採守勢。" },
@@ -465,19 +445,15 @@
         const people = db[currentMode][cat];
         const count = people.length;
 
-        // 高度壓縮邏輯：使用更小的間距乘數 (multiplier)
         people.forEach((p, i) => {
             const group = document.createElement('div');
             group.className = 'node-group';
             group.style.left = `${p.score}%`;
 
-            // 高度控制：
-            // 基數 40px，每個人錯開 35px，最大錯開層數限制在 5-6 層
-            // 這樣總高度大約控制在 250px 以內
-            let dist = 40 + (i % 5) * 35; 
-            
-            // 人多時 (如立委) 用多一點層次，但間距縮小
-            if (count > 15) dist = 35 + (i % 6) * 32;
+            // 高度壓縮設定：每個人只錯開 30px
+            let dist = 30 + (i % 5) * 30; 
+            // 人多時 (如立委) 用 6 層錯位
+            if (count > 15) dist = 25 + (i % 6) * 32;
 
             const isUp = i % 2 === 0;
             
@@ -495,6 +471,7 @@
 
             // 2. 頭像節點
             const node = document.createElement('div');
+            // 決定顏色
             let borderClass = 'b-ind';
             if(p.party === 'kmt') borderClass = 'b-kmt';
             if(p.party === 'dpp') borderClass = 'b-dpp';
@@ -502,37 +479,34 @@
             if(p.party === 'red') borderClass = 'b-red';
             
             node.className = `avatar-node ${borderClass}`;
-            
+            // 允許滑鼠事件 (pointer-events)
+            node.style.pointerEvents = 'auto';
+
             if (isUp) {
                 node.style.bottom = `${dist}px`;
-                node.style.marginBottom = '-18px'; // 修正圓心 (36px/2)
+                node.style.marginBottom = '-19px'; // 半徑微調
             } else {
                 node.style.top = `${dist}px`;
-                node.style.marginTop = '-18px';
+                node.style.marginTop = '-19px';
             }
 
-            // 圖片與文字備案處理
-            const imgUrl = avatarMap[p.name];
+            // 處理圖片與文字
+            const imgUrl = imgDb[p.name];
             
-            // 建立圖片元件
+            // 預設顯示文字
+            node.innerText = p.name.substring(0,1);
+
             if(imgUrl) {
                 const img = document.createElement('img');
                 img.src = imgUrl;
-                // 若圖片載入失敗，隱藏圖片，顯示下方的備用文字
-                img.onerror = function() {
-                    this.style.display = 'none';
-                    this.nextElementSibling.style.display = 'flex';
+                // 圖片載入成功後才顯示，並清空文字
+                img.onload = function() {
+                    this.style.display = 'block';
+                    node.innerText = ''; // 清空文字
+                    node.appendChild(this);
                 };
-                node.appendChild(img);
+                // 載入失敗則什麼都不做，保持顯示文字
             }
-            
-            // 建立備用文字元件 (預設隱藏，除非沒圖片或圖片壞掉)
-            const fallback = document.createElement('div');
-            fallback.className = 'fallback-text';
-            fallback.innerText = p.name.substring(0,1);
-            if(imgUrl) fallback.style.display = 'none'; // 有圖先藏字
-            
-            node.appendChild(fallback);
 
             node.onclick = () => showInfo(p, node, borderClass);
             
@@ -567,7 +541,7 @@
         document.getElementById('pAnalysis').innerHTML = data.analysis;
     }
 
-    // Init
+    // 啟動
     renderSubNav();
 
 </script>
